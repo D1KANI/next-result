@@ -1,5 +1,6 @@
 import { CreateEventForm } from "@/features/create-event";
 import { CreateEventSchema, trpc } from "@/shared/api";
+import { Layout } from "@/shared/components/Layout";
 import { useRouter } from "next/router";
 
 export default function CreateEvent() {
@@ -17,3 +18,5 @@ export default function CreateEvent() {
 
   return <CreateEventForm onSubmit={handleSubmit} />;
 }
+
+CreateEvent.getLayout = (page: React.ReactNode) => <Layout>{page}</Layout>;

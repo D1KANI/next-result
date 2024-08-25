@@ -1,4 +1,4 @@
-import { CreateEventSchema, JoinEventSchema } from "@/shared/api";
+import { CreateEventSchema, EditEventSchema, JoinEventSchema, LeaveEventSchema } from "@/shared/api";
 import { prisma } from "../db";
 import { isAuth, procedure, router } from "../trpc";
 import { z } from "zod";
@@ -20,7 +20,7 @@ export const eventRouter = router({
     .input(
       z.object({
         id: z.number(),
-      })
+      }),
     )
     .use(isAuth)
     .query(({ input }) => {
@@ -39,6 +39,7 @@ export const eventRouter = router({
               },
             },
           },
+          authorId: true,
         },
       });
     }),
@@ -53,6 +54,29 @@ export const eventRouter = router({
         },
       });
     }),
+  edit: procedure
+    .input(EditEventSchema)
+    .use(isAuth)
+    .mutation(async ({ input, ctx: { user } }) => {
+      const event = await prisma.event.findUnique({
+        where: { id: input.id },
+        select: { authorId: true },
+      });
+
+      if (!event || event.authorId !== user.id) {
+        throw new Error("Нет прав на редактирование этого события");
+      }
+
+      // Если пользователь - автор, обновляем событие
+      return prisma.event.update({
+        where: { id: input.id },
+        data: {
+          title: input.title,
+          description: input.description,
+          date: input.date,
+        },
+      });
+    }),
   join: procedure
     .input(JoinEventSchema)
     .use(isAuth)
@@ -61,6 +85,19 @@ export const eventRouter = router({
         data: {
           eventId: input.id,
           userId: user.id,
+        },
+      });
+    }),
+  leave: procedure
+    .input(LeaveEventSchema)
+    .use(isAuth)
+    .mutation(({ input, ctx: { user } }) => {
+      return prisma.participation.delete({
+        where: {
+          userId_eventId: {
+            userId: user.id,
+            eventId: input.id,
+          },
         },
       });
     }),
