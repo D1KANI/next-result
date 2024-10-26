@@ -2,6 +2,8 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
+For load project yu need env file. Read .env.example and create .env file.
+
 First, run the development server:
 
 ```bash
