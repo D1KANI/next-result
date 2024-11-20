@@ -1,6 +1,9 @@
 import { EventCard } from "@/entities/event";
 import { JoinEventButton } from "@/features/join-event";
+import { LeaveEventButton } from "@/features/leave-event";
 import { trpc } from "@/shared/api";
+import { Layout } from "@/shared/components/Layout";
+import { ReactNode } from "react";
 
 export default function Home() {
   const { data, refetch } = trpc.event.findMany.useQuery();
@@ -12,8 +15,10 @@ export default function Home() {
           <EventCard
             {...event}
             action={
-              !event.isJoined && (
+              !event.isJoined ? (
                 <JoinEventButton eventId={event.id} onSuccess={refetch} />
+              ) : (
+                <LeaveEventButton eventId={event.id} onSuccess={refetch} />
               )
             }
           />
@@ -21,4 +26,8 @@ export default function Home() {
       ))}
     </ul>
   );
+}
+
+Home.getLayout = (page: ReactNode) => {
+  return <Layout>{page}</Layout>;
 }

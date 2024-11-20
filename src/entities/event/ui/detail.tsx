@@ -1,12 +1,15 @@
 import { RouterOutput } from "@/shared/api";
 
-type EventDetailProps = NonNullable<RouterOutput["event"]["findUnique"]>;
+type EventDetailProps = NonNullable<RouterOutput["event"]["findUnique"]> & {
+  action?: React.ReactNode;
+};
 
 export const EventDetail = ({
   title,
   description,
   date,
   participations,
+  action,
 }: EventDetailProps) => {
   return (
     <div>
@@ -51,6 +54,7 @@ export const EventDetail = ({
           </div>
         </dl>
       </div>
+      {action}
     </div>
   );
 };
